@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HoPS CLI v8.0.857 · Quick Reference</title>
+    <style>
+        :root {
+            --ink: #172027;
+            --muted: #66737b;
+            --line: #dce3e7;
+            --paper: #f6f8f9;
+            --card: #fff;
+            --red: #b44735;
+            --code: #152128;
+            --hover-bg: #f0f4f7
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif
+        }
+
+        .bar {
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            position: relative;
+            z-index: 10
+        }
+
+        .bar>div,
+        main {
+            width: min(1120px, calc(100% - 40px));
+            margin: auto
+        }
+
+        .bar>div {
+            min-height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px
+        }
+
+        .bar-left {
+            display: flex;
+            align-items: center;
+            gap: 18px
+        }
+
+        .brand {
+            font-weight: 800;
+            letter-spacing: -.02em
+        }
+
+        /* --- Dropdown Menu Styles --- */
+        .dropdown {
+            position: relative;
+            display: inline-block
+        }
+
+        .dropdown-btn {
+            background: #fff;
+            border: 1px solid var(--line);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: border-color .15s, color .15s
+        }
+
+        .dropdown-btn:hover,
+        .dropdown:hover .dropdown-btn,
+        .dropdown:focus-within .dropdown-btn {
+            color: var(--red);
+            border-color: var(--red)
+        }
+
+        .dropdown-btn svg {
+            transition: transform .2s ease
+        }
+
+        .dropdown:hover .dropdown-btn svg,
+        .dropdown:focus-within .dropdown-btn svg {
+            transform: rotate(180deg)
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #fff;
+            border: 1px solid var(--line);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .08);
+            border-radius: 8px;
+            min-width: 220px;
+            padding: 6px 0;
+            z-index: 50;
+            list-style: none;
+            margin: 0
+        }
+
+        .dropdown:hover .dropdown-menu,
+        .dropdown:focus-within .dropdown-menu {
+            display: block
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 14px;
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background .15s
+        }
+
+        .dropdown-menu a span {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--muted)
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--hover-bg);
+            color: var(--red)
+        }
+
+        .tag,
+        .note {
+            color: var(--muted)
+        }
+
+        main {
+            padding: 40px 0 64px
+        }
+
+        .eyebrow {
+            margin: 0;
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .12em
+        }
+
+        h1 {
+            margin: 5px 0;
+            font-size: clamp(34px, 5vw, 52px);
+            line-height: 1.05;
+            letter-spacing: -.05em
+        }
+
+        .intro {
+            max-width: 750px;
+            color: var(--muted);
+            font-size: 17px
+        }
+
+        .tools {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            margin: 26px 0 18px;
+            padding: 10px 0;
+            background: #f6f8f9e8;
+            backdrop-filter: blur(8px);
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .search {
+            width: min(500px, 100%);
+            padding: 10px 12px;
+            border: 1px solid #bfcbd1;
+            border-radius: 8px;
+            font: inherit
+        }
+
+        .search:focus {
+            outline: 3px solid #b4473520;
+            border-color: var(--red)
+        }
+
+        .count {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .warning {
+            margin: 0 0 28px;
+            padding: 13px 16px;
+            border-left: 4px solid #e77817;
+            background: #fff7ed;
+            color: #68411d
+        }
+
+        .jump {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 34px
+        }
+
+        .jump a {
+            padding: 6px 10px;
+            border: 1px solid var(--line);
+            border-radius: 99px;
+            background: #fff;
+            color: var(--ink);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700
+        }
+
+        .jump a:hover {
+            color: var(--red);
+            border-color: var(--red)
+        }
+
+        section {
+            margin: 38px 0;
+            scroll-margin-top: 72px
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -.03em
+        }
+
+        .note {
+            margin: 4px 0 15px
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px
+        }
+
+        .cmd {
+            padding: 13px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--card)
+        }
+
+        .cmd h3 {
+            margin: 0 0 8px;
+            font-size: 14px
+        }
+
+        .row {
+            display: flex;
+            gap: 7px
+        }
+
+        code {
+            display: block;
+            min-width: 0;
+            flex: 1;
+            overflow: auto;
+            padding: 9px 10px;
+            border-radius: 6px;
+            background: var(--code);
+            color: #eef6f8;
+            font: 13px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+            white-space: nowrap
+        }
+
+        .copy {
+            min-width: 58px;
+            padding: 0 10px;
+            border: 1px solid #b8c5cb;
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer
+        }
+
+        .copy:hover {
+            color: var(--red);
+            border-color: var(--red)
+        }
+
+        .copied {
+            color: #19734a;
+            border-color: #86c7a5
+        }
+
+        .empty {
+            display: none;
+            padding: 18px;
+            border: 1px dashed #bfcbd1;
+            border-radius: 8px;
+            background: #fff;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        /* --- Back to Top Button --- */
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid var(--line);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ink);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .25s ease, visibility .25s ease, transform .2s ease, border-color .2s;
+            z-index: 99
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible
+        }
+
+        .back-to-top:hover {
+            color: var(--red);
+            border-color: var(--red);
+            transform: translateY(-3px)
+        }
+
+        @media(max-width:700px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:480px) {
+
+            .bar>div,
+            main {
+                width: calc(100% - 28px)
+            }
+
+            .tag,
+            .count {
+                display: none
+            }
+
+            main {
+                padding-top: 28px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="bar">
+        <div>
+            <div class="bar-left">
+                <span class="brand">HoPS CLI Quick Reference</span>
+
+                <!-- Dropdown Hover Menu -->
+                <div class="dropdown">
+                    <button class="dropdown-btn" aria-haspopup="true" aria-expanded="false">
+                        Related Docs
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                fill="none" />
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <!-- Add at the very top of the <ul class="dropdown-menu"> -->
+                        <li class="dropdown-home">
+                            <a href="index.html">
+                                <span class="home-title">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                        style="margin-right: 4px; vertical-align: -1px;">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z">
+                                        </path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                    Home Dashboard
+                                </span>
+                                <span>DC notes hub &amp; topic index</span>
+                            </a>
+                        </li>
+                        <li style="height: 1px; background: var(--line); margin: 4px 0;"></li>
+                        <li><a href="ilom_command.html">ILOM Commands<span>Hardware faults &amp;
+                                    diagnostics</span></a></li>
+                        <li><a href="hops_cli.html">HoPS CLI v8.0.857<span>Platform provisioning &amp;
+                                    orchestration</span></a></li>
+                        <li><a href="smartnic_triage.html">SmartNIC Triage<span>GPUv6 recovery &amp; SPI
+                                    boot</span></a></li>
+                        <li><a href="cable_validation.html">PCIe Cable Validation<span>Bus mapping &amp;
+                                    hwdiag tests</span></a></li>
+                        <li><a href="incident-log.html">Incident Log<span>Shift tracking &amp;
+                                    handovers</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <span class="tag">Oracle ILOM © 2026 Pravin Subramaniam. All rights reserved.</span>
+        </div>
+    </header>
+
+    <main id="top">
+        <p class="eyebrow">DATA CENTER QUICK NOTES</p>
+        <h1>HoPS CLI v8.0.857</h1>
+        <p class="intro">A practical, searchable command index. Select <b>Copy</b> to copy a command, then use
+            <code>help &lt;command&gt;</code> in HoPS for arguments and examples.
+        </p>
+        <div class="tools">
+            <input id="search" class="search" type="search" placeholder="Filter: SmartNIC, host, snapshot, ticket…"
+                aria-label="Filter HoPS commands">
+            <span id="count" class="count"></span>
+        </div>
+        <aside class="warning">
+            <b>Before running a command:</b> start required proxy processes, select the correct
+            realm/region and host, and confirm authorization for actions that alter host state, firmware, cases, or
+            tickets.
+        </aside>
+        <nav class="jump">
+            <a href="#start">Start here</a>
+            <a href="#host">Host &amp; selection</a>
+            <a href="#sp">SP / ILOM</a>
+            <a href="#smartnic">SmartNIC &amp; RoT</a>
+            <a href="#firmware">Firmware</a>
+            <a href="#plan">Plan &amp; network</a>
+            <a href="#bmc">BMC / OLOM</a>
+            <a href="#triage">Triage &amp; repair</a>
+            <a href="#ops">Host transitions</a>
+        </nav>
+        <div id="content"></div>
+        <p class="empty" id="empty">No commands match this filter.</p>
+        <footer>Command inventory updated from the supplied <b>HoPS CLI v8.0.857</b> help output. Availability and
+            parameters depend on your selected environment and permissions.</footer>
+    </main>
+
+    <!-- Back to Top Floating Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Scroll to top">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+    </button>
+
+    <script>
+        const groups = [
+            ["Start here", "Every session starts with selection, status, and built-in help.", ["help", "help_all", "version", "realm", "region", "regions_supported", "lregions", "clear_realm", "clear_regions", "host", "hosts", "lhosts", "qhosts", "rack", "racks", "lracks", "clear_hosts", "reload_hosts", "filter", "info", "state", "t", "th"]],
+            ["Host reporting & selection", "Inspect the selected host, its lifecycle, and related tracking.", ["info_all", "hardware_details", "firmware_details", "bios_config", "gpu_info", "nvswitch_info", "network_info", "network_details", "smartnic_info", "smartnic_details", "rot_info", "ilom_actions", "ticket_info", "tickets", "jobs", "workflows", "wf_instances", "provisioning", "tracking", "list_trackings", "last_jobs", "last_provision", "last_repair", "last_ready", "last_retries", "next_job", "failed_state", "recycle_info", "add_hosts", "add_partner_hosts", "add_tail_hosts", "remove_hosts", "import", "export", "ingest_host", "instance_info", "tail_node", "head_node"]],
+            ["Service processor / ILOM", "Use these for ILOM connectivity, console evidence, power checks, and open-problem handling.", ["connect", "connect_ws", "connect_ilom_serial", "sp_presence", "bulk_sp_presence", "sp_exec", "sp_execute", "sp_bulk_exec", "sp_bulk_execute", "open_problems", "clear_open_problems", "console_history", "clear_console_history", "console_match_file", "check_console_liveliness", "sp_snapshot", "sp_snapshot_ws", "sp_snapshot_ssh_command", "system_power_state", "system_power_on", "power_status_report", "bios_version", "load_xml_bios", "sp_set_password", "add_key_to_console_user", "setup_ilom_port_forwarding", "setup_sshfs_boot", "decrypt_ilom_breakglass_secret"]],
+            ["SmartNIC, RoT & NVOS", "SmartNIC and root-of-trust access, status, and recovery commands.", ["smartnic_presence", "bulk_smartnic_presence", "connect_smartnic", "connect_smartnic_ssh", "connect_smartnic_bmc", "smartnic_exec", "smartnic_execute", "smartnic_bmc_presence", "update_smartnic_details", "rot_presence", "connect_rot", "connect_rot_ws", "connect_postcard", "rot_exec", "rot_passthru", "rot_read_hv", "rot_version", "rot_fw_update", "rot_lockdown", "rot3_presence", "connect_rot3", "rot_diag", "rot_ac_cycle_host", "powercycle_sp", "rot_smartnic_spiboot", "smartnic_slots", "control_pensando_smartnic", "rot_pensando_enable_secure_boot", "rot_pensando_disable_secure_boot", "rot_set_pensando_write_controls", "connect_nvos", "connect_nvos_ws", "connect_nvos_custom_ws", "nvos_presence", "nvos_exec", "nvos_async_exec", "nvos_async_execute", "nvos_async_exec_status", "nvos_download_file"]],
+            ["Firmware as a Service", "Inventory, conformance, bundles, releases, and validation.", ["current_inventory", "current_inventory_in_bulk", "get_host_inventory", "firmware_history", "firmware_summary", "firmware_inventory_report", "firmware_inventory_aggregate_report", "firmware_details", "latest_firmwares_data", "check_conformance", "get_firmware_bundle", "get_firmware_by_path", "get_firmware_by_product_component_version", "get_shape_component_firmware_version", "list_firmware_bundles", "list_firmware_releases", "list_firmware_release_objects", "list_firmware_version_set_details", "retrieve_firmware_version_set", "get_available_firmware_updates", "firmware_version_sets", "firmware_pinning_summary", "start_firmware_validation", "schedule_firmware_validation_job_now", "firmware_validation_jobs", "firmware_validation_cicd_jobs", "firmware_validation_cicd_history", "firmware_validation_cicd_events", "firmware_preview"]],
+            ["Plan, network & inventory", "Retrieve plan topology, network mapping, and data-center inventory.", ["get_plan_device", "get_plan_devices", "get_plan_devices_by_serial", "get_plan_hostname", "get_plan_interfaces", "get_plan_ports", "get_serial_by_ip", "network_presence", "building_map", "get_sccp_info", "list_rack_info", "unallocated_racks", "list_ads", "list_buildings", "list_rooms", "list_racks", "list_platforms", "list_blocks", "list_storekeeper_assets", "show_storekeeper_asset", "show_storekeeper_catalog", "show_storekeeper_platform", "show_hops_device_details", "show_hops_halt_mode", "show_hops_test_endpoint", "export_xls", "download_hds_file"]],
+            ["BMC / OLOM", "Redfish-style BMC inventory, configuration, console, and snapshot actions.", ["bmc_presence", "bmc_system", "bmc_components", "bmc_component_fw_inventory", "bmc_fw_inventory", "bmc_eth_interfaces", "bmc_system_eth_interfaces", "bmc_chassis_cert_chain", "bmc_olom", "bmc_olom_agent", "bmc_olom_agents", "bmc_olom_config_dump", "bmc_olom_config_load", "bmc_olom_firmware", "bmc_olom_firmware_load", "bmc_olom_patch", "bmc_olom_restart", "bmc_olom_snapshot", "bmc_olom_snapshot_status", "bmc_olom_snapshot_download", "bmc_console_history_download", "bmc_manager", "bmc_manager_clock", "bmc_manager_collect_diagnostic_data", "bmc_manager_dump_log_entries", "bmc_manager_log_entries", "bmc_manager_reset", "bmc_manager_virtual_media", "bmc_accounts", "bmc_account_create", "bmc_account_delete", "bmc_account_get", "bmc_account_update_password", "bmc_bios_config", "bmc_bios_apply_config", "bmc_bios_reset_defaults", "bmc_system_open_problems", "openbmc_presence", "openbmc_power_state", "openbmc_reset", "redfish", "run_on_bmc"]],
+            ["Triage, repair & tickets", "Case, fault, repair, job, and DCO ticket workflows.", ["triage_list_hosts", "trs_host_repair_analysis", "trs_can_provision", "trs_unblock_can_provision", "trs_cleanup_dangling_host", "trs_list_broken_component", "trs_trs_tailnode_ilom_live_patch", "trs_get_halt_mode", "trs_update_halt_mode", "enable_halt_mode", "disable_halt_mode", "trs_get_active_cases", "trs_get_all_active_cases", "trs_get_case", "trs_list_cases", "trs_list_triage_cases", "trs_list_stuck_hosts", "trs_get_triage_case_log", "trs_get_triage_tracking_id", "trs_update_case", "trs_update_all_cases", "trs_add_case", "trs_add_broken_component", "trs_add_broken_asset_component", "trs_list_broken_asset_component", "trs_patch_broken_asset_component", "trs_mark_as_healthy", "trs_mark_broken_components_as_healthy", "trs_get_fault", "trs_list_all_faults", "trs_list_fault_queue", "trs_add_fault_to_fault_queue", "trs_get_repairRequest", "trs_list_repairRequests", "trs_add_repairRequest", "trs_update_repairRequest", "trs_get_job", "trs_list_jobs", "trs_get_logs", "trs_add_ticket", "trs_get_issue_ticket", "trs_get_ticket_status", "trs_get_ticket_resolution", "trs_list_unresolved_tickets", "trs_create_do_ticket_with_error_info", "create_cm_ticket"]],
+            ["Host transitions & operations", "Commands that change host lifecycle or apply maintenance. Confirm approval first.", ["allocate", "cleanup", "complete", "complete_job", "delete", "delete_device", "error", "fail_job", "repair", "rebuild", "quick_rebuild", "quick_parallel_rebuild", "bundle_rebuild", "selective_rebuild", "patch", "auto_patch", "auto_unpatch", "auto_unpatch_request", "non_terminating_firmware_update", "rma_wipe", "allocated_smartnic_wipe", "se_image", "staging", "testing", "terminate", "terminate_and_testing", "rebuild_batches", "delete_rack_info", "create_sequence", "get_sequence", "get_hosts_from_pool", "get_device_tracking_details", "scu_diagnosis", "validate_sk_data", "logs", "active_batchjobs", "patch_batchjob"]]
+        ];
+
+        const content = document.querySelector("#content");
+        groups.forEach(([title, note, commands], i) => {
+            const s = document.createElement("section");
+            s.id = ["start", "host", "sp", "smartnic", "firmware", "plan", "bmc", "triage", "ops"][i];
+            s.innerHTML = "<h2>" + title + "</h2><p class=\"note\">" + note + "</p><div class=\"grid\"></div>";
+            const grid = s.querySelector(".grid");
+            commands.forEach(command => {
+                const card = document.createElement("article");
+                card.className = "cmd";
+                card.innerHTML = "<h3>" + command.replaceAll("_", " ") + "</h3><div class=\"row\"><code>" + command + "</code><button class=\"copy\">Copy</button></div>";
+                grid.append(card);
+            });
+            content.append(s);
+        });
+
+        const cards = [...document.querySelectorAll(".cmd")];
+        const sections = [...document.querySelectorAll("main section")];
+        const search = document.querySelector("#search");
+        const count = document.querySelector("#count");
+        const empty = document.querySelector("#empty");
+
+        function filter() {
+            const term = search.value.trim().toLowerCase();
+            let n = 0;
+            cards.forEach(c => {
+                const yes = !term || c.textContent.toLowerCase().includes(term);
+                c.hidden = !yes;
+                if (yes) n++;
+            });
+            sections.forEach(s => s.hidden = term && ![...s.querySelectorAll(".cmd")].some(c => !c.hidden));
+            count.textContent = term ? `${n} command${n === 1 ? "" : "s"} found` : `${cards.length} commands`;
+            empty.style.display = term && !n ? "block" : "none";
+        }
+
+        search.addEventListener("input", filter);
+        filter();
+
+        // Clipboard Copy handler
+        document.querySelectorAll(".copy").forEach(b => b.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(b.previousElementSibling.textContent);
+                b.textContent = "Copied";
+                b.classList.add("copied");
+            } catch {
+                b.textContent = "Select";
+            }
+            setTimeout(() => {
+                b.textContent = "Copy";
+                b.classList.remove("copied");
+            }, 1300);
+        }));
+
+        // Back to Top Scroll Behavior
+        const backToTopBtn = document.getElementById("backToTop");
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 240) {
+                backToTopBtn.classList.add("visible");
+            } else {
+                backToTopBtn.classList.remove("visible");
+            }
+        });
+
+        backToTopBtn.addEventListener("click", () => {
+            window.scrollTo({top: 0, behavior: "smooth"});
+        });
+    </script>
+</body>
+
+</html>

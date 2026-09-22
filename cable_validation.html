@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GPUv6 PCIe cable validation SOP across Head Node and Tail Node." />
+  <title>GPUv6 Cable Validation | Safe Site SOP</title>
+  <style>
+    :root {
+      --ink: #172027;
+      --muted: #66737b;
+      --line: #dce3e7;
+      --paper: #f6f8f9;
+      --card: #ffffff;
+      --red: #b44735;
+      --red-hover: #983b2a;
+      --code: #152128;
+      --hover-bg: #f0f4f7;
+      --green: #19734a;
+      --green-bg: #eaf5ee;
+      --warn-border: #efc79c;
+      --warn-bg: #fffdfa;
+      --shadow-sm: 0 2px 8px rgba(23, 32, 39, 0.04);
+      --shadow-md: 0 10px 25px -5px rgba(23, 32, 39, 0.08), 0 8px 10px -6px rgba(23, 32, 39, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* --- Global Sticky Header Bar --- */
+    .bar {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .bar-inner {
+      width: min(1180px, calc(100% - 40px));
+      margin: auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .bar-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand {
+      font-weight: 800
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 6px;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-text {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* --- Global Navigation Dropdown --- */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-btn {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .dropdown-btn:hover,
+    .dropdown:hover .dropdown-btn,
+    .dropdown:focus-within .dropdown-btn {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .dropdown-btn svg {
+      transition: transform 0.2s ease;
+    }
+
+    .dropdown:hover .dropdown-btn svg,
+    .dropdown:focus-within .dropdown-btn svg {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      border-radius: 8px;
+      min-width: 250px;
+      padding: 6px 0;
+      z-index: 50;
+      list-style: none;
+      margin: 0;
+    }
+
+    .dropdown:hover .dropdown-menu,
+    .dropdown:focus-within .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu a {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 14px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    .dropdown-menu a span {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--hover-bg);
+      color: var(--red);
+    }
+
+    /* --- Clock Telemetry Widget --- */
+    .telemetry-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .clock-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--hover-bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      color: var(--ink);
+    }
+
+    .clock-segment {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .clock-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-family: system-ui, sans-serif;
+    }
+
+    .clock-divider {
+      color: var(--line);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      background: var(--green-bg);
+      border: 1px solid #c7e3d1;
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    .status-badge span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 2px rgba(25, 115, 74, 0.2);
+    }
+
+    /* --- Main Layout --- */
+    main {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 40px 0 64px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4.5vw, 48px);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .intro {
+      max-width: 780px;
+      margin: 12px 0 24px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    /* Operational Callout Box */
+    .callout {
+      margin: 20px 0 28px;
+      padding: 16px 20px;
+      border-left: 4px solid var(--red);
+      background: #fff7ed;
+      border-radius: 0 8px 8px 0;
+      color: #68411d;
+      font-size: 13px;
+      line-height: 1.55;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .callout p {
+      margin: 4px 0;
+    }
+
+    .callout strong {
+      color: #4a2c10;
+      white-space: nowrap;
+    }
+
+    /* Jump Pills Navigation */
+    .jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 34px;
+    }
+
+    .jump a {
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .jump a:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    section {
+      margin: 44px 0;
+      scroll-margin-top: 80px;
+    }
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .section-note {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Step Cards */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .step-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .step-num {
+      background: var(--hover-bg);
+      color: var(--red);
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      text-transform: uppercase;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    .step-card h3 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .step-card p {
+      margin: 8px 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Code Container & Click-to-Copy */
+    .code-row {
+      position: relative;
+      margin-top: 8px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 12px 14px;
+      padding-right: 76px;
+      border-radius: 6px;
+      background: var(--code);
+      color: #eef6f8;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 10px;
+      border: 1px solid #4a5c66;
+      border-radius: 5px;
+      background: #25333d;
+      color: #eef6f8;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: #374a58;
+      border-color: #728a99;
+    }
+
+    .copy-btn.copied {
+      background: var(--green);
+      border-color: #86c7a5;
+      color: #fff;
+    }
+
+    /* Output Sample Box */
+    .code-sample {
+      background: #111a1f;
+      color: #d2dbe0;
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      border: 1px solid #25333d;
+      margin-bottom: 20px;
+    }
+
+    .highlight {
+      color: #ff9d8d;
+      font-weight: 700;
+      background: rgba(180, 71, 53, 0.25);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* Structured Verification Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      margin-top: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    th {
+      background: var(--hover-bg);
+      color: var(--ink);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    code.inline-code {
+      display: inline;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #eef3f6;
+      color: #172027;
+      font-size: 12px;
+      border: 1px solid #dce3e7;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Back to Top Floating Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.2s ease, border-color 0.2s;
+      z-index: 99;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      color: var(--red);
+      border-color: var(--red);
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 760px) {
+      .bar-inner {
+        height: auto;
+        padding: 12px 0;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .telemetry-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 480px) {
+      main {
+        width: calc(100% - 28px);
+        padding-top: 28px;
+      }
+
+      .clock-pill {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sticky Operational Header -->
+  <header class="bar">
+    <div class="bar-inner">
+      <div class="bar-left">
+        <span class="brand">PCIe Cable Validation</span>
+
+        <!-- Dropdown Hover Menu -->
+        <div class="dropdown">
+          <button class="dropdown-btn" aria-haspopup="true" aria-expanded="false">
+            Related Docs
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" />
+            </svg>
+          </button>
+          <ul class="dropdown-menu">
+            <!-- Add at the very top of the <ul class="dropdown-menu"> -->
+            <li class="dropdown-home">
+              <a href="index.html">
+                <span class="home-title">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: -1px;">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z">
+                    </path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                  Home Dashboard
+                </span>
+                <span>DC notes hub &amp; topic index</span>
+              </a>
+            </li>
+            <li style="height: 1px; background: var(--line); margin: 4px 0;"></li>
+            <li><a href="ilom_command.html">ILOM Commands<span>Hardware faults &amp;
+                  diagnostics</span></a></li>
+            <li><a href="hops_cli.html">HoPS CLI v8.0.857<span>Platform provisioning &amp;
+                  orchestration</span></a></li>
+            <li><a href="smartnic_triage.html">SmartNIC Triage<span>GPUv6 recovery &amp; SPI
+                  boot</span></a></li>
+            <li><a href="cable_validation.html">PCIe Cable Validation<span>Bus mapping &amp;
+                  hwdiag tests</span></a></li>
+            <li><a href="incident-log.html">Incident Log<span>Shift tracking &amp;
+                  handovers</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <span class="tag">Oracle ILOM © 2026 Pravin Subramaniam. All rights reserved.</span>
+    </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <p class="eyebrow">FIELD SOP &amp; REPAIR</p>
+    <h1>GPUv6 PCIe Cable Validation Guide</h1>
+    <p class="intro">
+      Step-by-step verification procedure for GPUv6 PCIe link training, cable mapping, and switch bus verification
+      across Head Node and Tail Node.
+    </p>
+
+    <!-- Operational Objective Callout -->
+    <aside class="callout">
+      <p><strong>Required Tools:</strong> HOPS CLI, Bastion Host, and ILOM SP Diag Shell</p>
+      <p><strong>Primary Objective:</strong> Ensure all 8 OAM bus endpoints (<code class="inline-code">0D</code>, <code
+          class="inline-code">5D</code>, <code class="inline-code">A7</code>, <code class="inline-code">26</code>, <code
+          class="inline-code">F4</code>, <code class="inline-code">75</code>, <code class="inline-code">8E</code>, <code
+          class="inline-code">DC</code>) train successfully and match switch line outputs.</p>
+    </aside>
+
+    <!-- Jump Navigation -->
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#prep">1. Target IP Discovery</a>
+      <a href="#headnode">2. Head Node Trigger</a>
+      <a href="#tailnode">3. Tail Node PCIe Status</a>
+      <a href="#verification">4. Bus Verification Matrix</a>
+    </nav>
+
+    <!-- Phase 1 -->
+    <section id="prep">
+      <h2>Phase 1: Initial Discovery (HOPS CLI)</h2>
+      <p class="section-note">Check host state and gather target ILOM IP address before connecting through the bastion
+        tool.</p>
+      <div class="step-list">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">Step 1</span>
+            <h3>Gather Network &amp; State Information</h3>
+          </div>
+          <div class="code-row">
+            <pre><code>state
+network_info
+# Extract the target ILOM IP, then connect via the Bastion tool</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phase 2 -->
+    <section id="headnode">
+      <h2>Phase 2: Cable Check Trigger (Head Node &amp; Tail Node)</h2>
+      <p class="section-note">Run flow triggers on both nodes; observe results on the head node.</p>
+      <div class="step-list">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">Step 2</span>
+            <h3>Initiate Cable Validation Flow</h3>
+          </div>
+          <div class="code-row">
+            <pre><code>set -script /SP system_contact=flow=cable_check_flow
+load -source https://hops-data-service.svc.ad1.ap-kulai-1:11001/firmware/GPUv6_Update_AMD_100_1_5_6.pkg.signed -nowait -script</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phase 3 -->
+    <section id="tailnode">
+      <h2>Phase 3: Bus Extraction (Tail Node)</h2>
+      <p class="section-note">Collect PCIe status output from the diagnostic shell and extract downstream bus
+        identifiers.</p>
+      <div class="step-list">
+        <!-- Step 3.1 -->
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">Step 3.1</span>
+            <h3>Dump Diagnostics to File</h3>
+          </div>
+          <div class="code-row">
+            <pre><code>start /SP/diag/shell -script
+hwdiag pci status all</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <p><em>Save the entire command output to a local working file named <code>pci.txt</code>.</em></p>
+        </div>
+
+        <!-- Step 3.2 -->
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">Step 3.2</span>
+            <h3>Extract OAM Bus Identifiers</h3>
+          </div>
+          <div class="code-row">
+            <pre><code>grep -A1 OAM pci.txt | grep BUSES | sed -E 's/.*\(([0-9A-F]+<->[0-9A-F]+)\).*/\1/' | awk -F '>' '{print $2}'</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <p>The regex pipeline filters down to the 8 expected bus targets:</p>
+          <div class="code-row">
+            <pre><code>0D
+5D
+A7
+26
+F4
+75
+8E
+DC</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phase 4 -->
+    <section id="verification">
+      <h2>Phase 4: Output Verification Guide</h2>
+      <p class="section-note">Confirm all 8 extracted hex codes correspond to the downstream bus (line 3) for each PCIe
+        switch block.</p>
+
+      <div class="code-sample">
+        SWITCH: PCIE_SW1
+        Retimer 1
+        PCIe Slot 1
+        OAM5
+        DUP1_SSUI
+
+        STATION: @ ACTIVE: yes, TRAINING: done, Gen5x16, SLOT: NA, TYPE: Upstream Port of PCI Express Switch
+        BUSES: 01 (02 &lt;-&gt; 16), CAP: Gen5x16, DIDVID: C0301000, SUB_DIDVID: 00721000
+        STATION: 1 ACTIVE: yes, TRAINING: done, Gen5x16, SLOT: 0, TYPE: Downstream Port of PCI Express Switch
+        STATION: 2 ACTIVE: yes, TRAINING: done, Gen5x16, SLOT: 0, TYPE: Downstream Port of PCI Express Switch
+        BUSES: 0A (0B &lt;-&gt; <span class="highlight">0D</span>), CAP: Gen5x16, DIDVID: C0301000, SUB_DIDVID: 00721000
+        <span class="highlight">&lt;--- Line 3 Target Bus</span>
+        STATION: 3 ACTIVE: yes, TRAINING: done, Gen4x4, SLOT: 54, TYPE: Downstream Port of PCI Express Switch
+        BUSES: 0F (13 &lt;-&gt; 13), CAP: Gen5x4, DIDVID: C0301000, SUB_DIDVID: 00721000
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 30%;">Check Parameter</th>
+              <th>Required Value / Target State</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Training State</strong></td>
+              <td><code class="inline-code">TRAINING: done</code>, <code class="inline-code">ACTIVE: yes</code></td>
+            </tr>
+            <tr>
+              <td><strong>Link Speed / Width</strong></td>
+              <td><code class="inline-code">Gen5x16</code> (Upstream/Downstream switch ports)</td>
+            </tr>
+            <tr>
+              <td><strong>Bus Hex Alignment</strong></td>
+              <td>All 8 extracted hex codes verified across respective PCIe switches</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div>GPUv6 Hardware Commissioning &bull; Confirm target topology before reporting link failures.</div>
+      <div>&copy; 2026 Pravin Subramaniam. All rights reserved.</div>
+    </footer>
+  </main>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Scroll to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  </button>
+
+  <script>
+    // Live Multi-Timezone Operational Clocks
+    function updateClock() {
+      const now = new Date();
+
+      // UTC Time (HH:MM:SS)
+      const utcHours = String(now.getUTCHours()).padStart(2, '0');
+      const utcMinutes = String(now.getUTCMinutes()).padStart(2, '0');
+      const utcSeconds = String(now.getUTCSeconds()).padStart(2, '0');
+      document.getElementById('utcTime').textContent = `${utcHours}:${utcMinutes}:${utcSeconds}`;
+
+      // Local Date & Time (YYYY-MM-DD HH:MM:SS)
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const localHours = String(now.getHours()).padStart(2, '0');
+      const localMinutes = String(now.getMinutes()).padStart(2, '0');
+      const localSeconds = String(now.getSeconds()).padStart(2, '0');
+
+      document.getElementById('localDate').textContent = `${year}-${month}-${day}`;
+      document.getElementById('localTime').textContent = `${localHours}:${localMinutes}:${localSeconds}`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Clipboard Copy Handler for All Code Rows
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pre = btn.closest('.code-row').querySelector('pre code');
+        if (!pre) return;
+        try {
+          await navigator.clipboard.writeText(pre.textContent.trim());
+          const originalText = btn.textContent;
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('copied');
+          }, 1300);
+        } catch {
+          btn.textContent = 'Failed';
+        }
+      });
+    });
+
+    // Back to Top Scroll Behavior
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 240) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+  </script>
+</body>
+
+</html>

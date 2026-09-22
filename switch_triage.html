@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="Switch Triage Quick Reference: Mellanox mlxlink, NVIDIA Quantum InfiniBand, and Arista EOS commands." name="description"/>
+  <title>Switch Triage &amp; Transceiver Quick Reference</title>
+  <style>
+    :root {
+      --ink: #172027;
+      --muted: #66737b;
+      --line: #dce3e7;
+      --paper: #f6f8f9;
+      --card: #ffffff;
+      --red: #b44735;
+      --red-hover: #983b2a;
+      --code: #152128;
+      --hover-bg: #f0f4f7;
+      --green: #19734a;
+      --green-bg: #eaf5ee;
+      --warn-border: #efc79c;
+      --warn-bg: #fffdfa;
+      --shadow-sm: 0 2px 8px rgba(23, 32, 39, 0.04);
+      --shadow-md: 0 10px 25px -5px rgba(23, 32, 39, 0.08), 0 8px 10px -6px rgba(23, 32, 39, 0.04);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--paper);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* --- Sticky Top Header --- */
+    .bar {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .bar-inner {
+      width: min(1180px, calc(100% - 40px));
+      margin: auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .bar-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 6px;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-text {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* --- Navigation Dropdown --- */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-btn {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .dropdown-btn:hover,
+    .dropdown:hover .dropdown-btn,
+    .dropdown:focus-within .dropdown-btn {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .dropdown-btn svg {
+      transition: transform 0.2s ease;
+    }
+
+    .dropdown:hover .dropdown-btn svg,
+    .dropdown:focus-within .dropdown-btn svg {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      border-radius: 8px;
+      min-width: 260px;
+      padding: 6px 0;
+      z-index: 50;
+      list-style: none;
+      margin: 0;
+    }
+
+    .dropdown:hover .dropdown-menu,
+    .dropdown:focus-within .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu a {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 14px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    .dropdown-menu a span {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--hover-bg);
+      color: var(--red);
+    }
+
+    /* --- Clock Telemetry --- */
+    .telemetry-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .clock-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--hover-bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 12px;
+      color: var(--ink);
+    }
+
+    .clock-segment {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .clock-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-family: system-ui, sans-serif;
+    }
+
+    .clock-divider {
+      color: var(--line);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      background: var(--green-bg);
+      border: 1px solid #c7e3d1;
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+
+    .status-badge span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 2px rgba(25, 115, 74, 0.2);
+    }
+
+    /* --- Main Workspace --- */
+    main {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 40px 0 64px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4.5vw, 48px);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .intro {
+      max-width: 780px;
+      margin: 12px 0 20px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    /* Filter Toolbar */
+    .tools {
+      position: sticky;
+      top: 64px;
+      z-index: 20;
+      margin: 20px 0 16px;
+      padding: 10px 0;
+      background: #f6f8f9e8;
+      backdrop-filter: blur(8px);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search {
+      width: min(480px, 100%);
+      padding: 10px 12px;
+      border: 1px solid #bfcbd1;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    .count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Alert Banner */
+    .warning-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin: 10px 0 26px;
+      padding: 14px 18px;
+      border-left: 4px solid #e77817;
+      background: #fff7ed;
+      border-radius: 0 8px 8px 0;
+      color: #68411d;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .warning-box strong {
+      color: #4a2c10;
+      white-space: nowrap;
+    }
+
+    /* Jump Pills */
+    .jump {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 34px;
+    }
+
+    .jump a {
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .jump a:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    section {
+      margin: 40px 0;
+      scroll-margin-top: 140px;
+    }
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .section-note {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Card Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .cmd {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cmd.danger {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+    }
+
+    .cmd h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .cmd.danger h3 {
+      color: #97521b;
+    }
+
+    .row {
+      position: relative;
+    }
+
+    pre {
+      margin: 0;
+      padding: 10px 12px;
+      padding-right: 76px;
+      border-radius: 6px;
+      background: var(--code);
+      color: #eef6f8;
+      font: 13px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .copy {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 4px 10px;
+      border: 1px solid #4a5c66;
+      border-radius: 5px;
+      background: #25333d;
+      color: #eef6f8;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .copy:hover {
+      background: #374a58;
+      border-color: #728a99;
+    }
+
+    .copy.copied {
+      background: var(--green);
+      border-color: #86c7a5;
+      color: #fff;
+    }
+
+    .cmd p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty {
+      display: none;
+      padding: 24px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Back to Top */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.2s ease;
+      z-index: 99;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      color: var(--red);
+      border-color: var(--red);
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 760px) {
+      .bar-inner {
+        height: auto;
+        padding: 12px 0;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .telemetry-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Operational Header -->
+  <header class="bar">
+    <div class="bar-inner">
+      <div class="bar-left">
+        <a class="brand" href="index.html" aria-label="Data Center Quick Notes Home">
+          <div class="brand-mark" aria-hidden="true">DC</div>
+          <div class="brand-text">Switch Triage Notes</div>
+        </a>
+
+        <!-- Navigation Dropdown -->
+        <div class="dropdown">
+          <button class="dropdown-btn" aria-haspopup="true" aria-expanded="false">
+            Related Docs
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="index.html">Operations Hub<span>Central overview &amp; active runbooks</span></a></li>
+            <li style="height: 1px; background: var(--line); margin: 4px 0;"></li>
+            <li><a href="ilom_command.html">ILOM Commands<span>Hardware faults &amp; diagnostics</span></a></li>
+            <li><a href="hops_cli.html">HoPS CLI v8.0.857<span>Platform provisioning &amp; orchestration</span></a></li>
+            <li><a href="smartnic_triage.html">SmartNIC Triage<span>GPUv6 recovery &amp; SPI boot</span></a></li>
+            <li><a href="cable_validation.html">PCIe Cable Validation<span>Bus mapping &amp; hwdiag tests</span></a></li>
+            <li><a href="switch_triage.html">Switch Triage<span>Mellanox, NVIDIA IB &amp; Arista EOS</span></a></li>
+            <li><a href="incident-log.html">Incident Log<span>Shift tracking &amp; handovers</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Real-Time Operational Clocks -->
+      <div class="telemetry-group">
+        <div class="clock-pill" aria-label="Real-time operational clocks">
+          <div class="clock-segment">
+            <span class="clock-label">UTC</span>
+            <span id="utcTime">--:--:--</span>
+          </div>
+          <span class="clock-divider">|</span>
+          <div class="clock-segment">
+            <span class="clock-label">Local</span>
+            <span id="localDate">--/--/----</span>
+            <span id="localTime">--:--:--</span>
+          </div>
+        </div>
+
+        <div class="status-badge">
+          <span aria-hidden="true"></span>
+          <span>Local Offline</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <p class="eyebrow">NETWORK &amp; FABRIC TRIAGE</p>
+    <h1>Switch &amp; Optical Triage Reference</h1>
+    <p class="intro">Field cheat sheet for Bastion connectivity, Mellanox MST/mlxlink diagnostics, NVIDIA Quantum InfiniBand link verification, and Arista EOS leaf/spine validation.</p>
+
+    <!-- Filter Tools -->
+    <div class="tools">
+      <input id="search" class="search" type="search" placeholder="Filter: mlxlink, BER, transceiver, I2C, Arista, counters…" aria-label="Filter switch commands">
+      <span id="count" class="count"></span>
+    </div>
+
+    <!-- Operational Advisory -->
+    <aside class="warning-box">
+      <strong>Engineering Reminder:</strong>
+      <span>In Mellanox/NVIDIA diagnostics, enter <code>fae</code> mode prior to running low-level BER and DDM flags. Clear counters only after baseline error rates have been recorded in the shift handover or incident ticket.</span>
+    </aside>
+
+    <!-- Jump Navigation -->
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#bastion">Bastion Access</a>
+      <a href="#mlxlink">Mellanox mlxlink</a>
+      <a href="#nvidia-ib">NVIDIA Quantum IB</a>
+      <a href="#arista">Arista EOS</a>
+      <a href="#advanced">Fabric Deep Dive</a>
+    </nav>
+
+    <!-- Section 1: Bastion Access -->
+    <section id="bastion">
+      <h2>1. Bastion &amp; Switch SSH Access</h2>
+      <p class="section-note">Use when direct switch access is blocked or PKCS11 tokens cause authentication failure.</p>
+      <div class="grid">
+        <article class="cmd">
+          <h3>Standard Switch SSH</h3>
+          <div class="row">
+            <pre><code>ssh root@&lt;switch-ip-or-hostname&gt;</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Standard administrative switch login.</p>
+        </article>
+
+        <article class="cmd danger">
+          <h3>Bastion Bypass SSH (No PKCS11 / Token Bypass)</h3>
+          <div class="row">
+            <pre><code>ssh -o IdentitiesOnly=yes -o PKCS11Provider=none abmazlan@&lt;switch-ip&gt;</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Run on Bastion host when hardware tokens or agent auth locks out direct SSH.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Section 2: Mellanox mlxlink -->
+    <!-- Operational Advisory -->
+    <aside class="warning-box">
+      <strong>Port Notation &amp; Engineering Rule:</strong>
+      <span>Parameters such as <code>-p 1/1</code>, <code>-p 2/1</code>, or <code>49/1</code> represent physical <strong>cage/port and split-lane breakout numbers</strong>. Enter <code>fae</code> mode prior to executing low-level BER and DDM queries. Record baseline counters before clearing.</span>
+    </aside>
+    <section id="mlxlink">
+      <h2>2. Mellanox MST &amp; mlxlink Triage</h2>
+      <p class="section-note">Low-level ASIC, transceiver DDM, and BER monitoring via the MST subsystem. (Note: <code>-p &lt;port/lane&gt;</code> specifies the physical port/split, e.g., <code>1/1</code> or <code>2/1</code>).</p>
+      <div class="grid">
+        <article class="cmd">
+          <h3>Enter FAE Diagnostic Mode</h3>
+          <div class="row">
+            <pre><code>fae</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Required prerequisite on NVIDIA/Mellanox switches before running advanced cable/DDM flags.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>DDM Optical Levels &amp; BER Monitor (Port 1/1)</h3>
+          <div class="row">
+            <pre><code>mlxlink -d /dev/mst/mt54002_pciconf0 --cable --ddm -p 1/1 -c</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Queries physical port <strong>1/1</strong> for live optical power (DDM) and bit error rate (show_ber_monitor).</p>
+        </article>
+
+        <article class="cmd">
+          <h3>DDM with Extended Module Details (Port 2/1)</h3>
+          <div class="row">
+            <pre><code>mlxlink -d /dev/mst/mt54002_pciconf0 --cable --ddm -p 2/1 -c -m</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Queries physical port <strong>2/1</strong> with full module EEPROM details and per-lane power.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Eye Diagram &amp; Module Telemetry (Port 1/2)</h3>
+          <div class="row">
+            <pre><code>mlxlink -d /dev/mst/mt54002_pciconf0 -p 1/2 -e -m -c</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Queries physical port <strong>1/2</strong> for eye opening diagnostics (<code>-e</code>), module info (<code>-m</code>), and status (<code>-c</code>).</p>
+        </article>
+
+        <article class="cmd danger">
+          <h3>Clear Error Counters (Port 1/1)</h3>
+          <div class="row">
+            <pre><code>mlxlink -d /dev/mst/mt54002_pciconf0 -p 1/1 --pc</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Clears hardware error counters specifically on port <strong>1/1</strong>. Enter <code>fae</code> first.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>List Local MST Devices</h3>
+          <div class="row">
+            <pre><code>mst status -v</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Lists available PCI endpoints if targeting a device path other than <code>mt54002_pciconf0</code>.</p>
+        </article>
+      </div>
+    </section>
+    
+    <!-- Section 3: NVIDIA Quantum IB -->
+    <section id="nvidia-ib">
+      <h2>3. NVIDIA Quantum InfiniBand CLI</h2>
+      <p class="section-note">Switch-level fabric verification, port status, and real-time optical power polling.</p>
+      <div class="grid">
+        <article class="cmd">
+          <h3>Show All IB Transceivers</h3>
+          <div class="row">
+            <pre><code>show interfaces ib transceiver</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Global readout of all connected QSFP/OSFP transceivers and cables.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>I2C Optical Bus Check (Hang / Bug Triage)</h3>
+          <div class="row">
+            <pre><code>show interfaces ib transceiver | include I2c</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Checks for stuck I2C busses causing missing transceivers or telemetry drops.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Real-Time Optical Power Polling (TX/RX Loop)</h3>
+          <div class="row">
+            <pre><code>show interfaces ib 1/6/1 transceiver diagnostics | watch interval 1</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>1-second refresh on optical levels. Essential when reseating or cleaning fiber.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Single Port Link Diagnostics</h3>
+          <div class="row">
+            <pre><code>show interfaces ib 1/28/1 link-diagnostics</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Checks symbol errors, recovery sequences, and physical lane training state.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Port Physical &amp; Logical Status</h3>
+          <div class="row">
+            <pre><code>show interfaces ib 1/22/1 status</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Displays admin state, physical link state, MTU, and negotiated speed (NDR/HDR).</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Port Hardware Error Counters</h3>
+          <div class="row">
+            <pre><code>show interfaces ib 1/17/1 counters</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Inspects packet discards, symbol errors, and link buffer overruns.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Section 4: Arista EOS -->
+    <section id="arista">
+      <h2>4. Arista EOS Ethernet Triage</h2>
+      <p class="section-note">Ethernet fabric, CRC error detection, transceiver DOM values, and STP state checks.</p>
+      <div class="grid">
+        <article class="cmd">
+          <h3>Interface Details, Errors &amp; CRC</h3>
+          <div class="row">
+            <pre><code>show interfaces ethernet 49/1</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Displays line protocol state, input/output CRC errors, runt packets, and bandwidth.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Digital Optical Monitoring (DOM / DDM)</h3>
+          <div class="row">
+            <pre><code>show interfaces ethernet 49/1 transceiver detail</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Inspects TX bias current, TX power, RX optical power, and alarm/warning thresholds.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Global Transceiver Presence Summary</h3>
+          <div class="row">
+            <pre><code>show interface transceiver</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Table of all inserted optics, serial numbers, vendors, and wavelengths.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Spanning Tree Blocked Ports</h3>
+          <div class="row">
+            <pre><code>show spanning-tree</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Verifies whether STP has placed a suspected down link into blocking or discarding mode.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>Recent Switch Syslog &amp; Link Flaps</h3>
+          <div class="row">
+            <pre><code>show logging | tail 50</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Inspects system event log for port flaps, optical power threshold traps, or STP shifts.</p>
+        </article>
+
+        <article class="cmd danger">
+          <h3>Clear Ethernet Counters</h3>
+          <div class="row">
+            <pre><code>clear counters ethernet 49/1</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Resets packet and CRC error counters to zero for clean loop verification.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Section 5: Advanced Fabric Helpers -->
+    <section id="advanced">
+      <h2>5. Advanced Fabric Helpers (LLDP, Optics &amp; Port Bounce)</h2>
+      <p class="section-note">High-value utility commands for neighbor discovery and controlled bounce sequences.</p>
+      <div class="grid">
+        <article class="cmd">
+          <h3>LLDP Neighbor Verification (Arista EOS)</h3>
+          <div class="row">
+            <pre><code>show lldp neighbors ethernet 49/1 detail</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Verifies the far-end hostname, management IP, and peer port connected to the cable.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>LACP Port-Channel Aggregation State (Arista EOS)</h3>
+          <div class="row">
+            <pre><code>show lacp interface ethernet 49/1</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Verifies actor/partner sync and determines if bundle negotiation is failing.</p>
+        </article>
+
+        <article class="cmd">
+          <h3>InfiniBand IBnetdiscover (Host/Subnet Manager)</h3>
+          <div class="row">
+            <pre><code>ibnetdiscover -p | grep -E "&lt;switch-guid-or-lid&gt;"</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Maps fabric topology and peer GUIDs across the high-speed IB network.</p>
+        </article>
+
+        <article class="cmd danger">
+          <h3>Controlled Port Bounce (Arista EOS)</h3>
+          <div class="row">
+            <pre><code>configure
+interface ethernet 49/1
+shutdown
+! wait 10s
+no shutdown
+end</code></pre>
+            <button class="copy">Copy</button>
+          </div>
+          <p>Forces laser retrain and link renegotiation on sticky optical ports.</p>
+        </article>
+      </div>
+    </section>
+
+    <p class="empty" id="empty">No switch commands match this filter.</p>
+
+    <!-- Footer -->
+    <footer>
+      <div>Switch Triage Quick Reference &bull; Mellanox MST, NVIDIA IB, Arista EOS</div>
+      <div>&copy; 2026 Pravin Subramaniam. All rights reserved.</div>
+    </footer>
+  </main>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Scroll to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  </button>
+
+  <script>
+    // Live Multi-Timezone Operational Clocks
+    function updateClock() {
+      const now = new Date();
+
+      // UTC Time (HH:MM:SS)
+      const utcHours = String(now.getUTCHours()).padStart(2, '0');
+      const utcMinutes = String(now.getUTCMinutes()).padStart(2, '0');
+      const utcSeconds = String(now.getUTCSeconds()).padStart(2, '0');
+      document.getElementById('utcTime').textContent = `${utcHours}:${utcMinutes}:${utcSeconds}`;
+
+      // Local Date & Time (YYYY-MM-DD HH:MM:SS)
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const localHours = String(now.getHours()).padStart(2, '0');
+      const localMinutes = String(now.getMinutes()).padStart(2, '0');
+      const localSeconds = String(now.getSeconds()).padStart(2, '0');
+
+      document.getElementById('localDate').textContent = `${year}-${month}-${day}`;
+      document.getElementById('localTime').textContent = `${localHours}:${localMinutes}:${localSeconds}`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Search and Filter Logic
+    const cards = [...document.querySelectorAll('.cmd')];
+    const sections = [...document.querySelectorAll('main section')];
+    const search = document.querySelector('#search');
+    const count = document.querySelector('#count');
+    const empty = document.querySelector('#empty');
+
+    function filter() {
+      const t = search.value.trim().toLowerCase();
+      let n = 0;
+      cards.forEach(c => {
+        const yes = !t || c.textContent.toLowerCase().includes(t);
+        c.hidden = !yes;
+        if (yes) n++;
+      });
+      sections.forEach(s => s.hidden = t && ![...s.querySelectorAll('.cmd')].some(c => !c.hidden));
+      count.textContent = t ? `${n} command${n === 1 ? '' : 's'} found` : `${cards.length} commands`;
+      empty.style.display = t && !n ? 'block' : 'none';
+    }
+
+    search.addEventListener('input', filter);
+    filter();
+
+    // Clipboard Copy Handler
+    document.querySelectorAll('.copy').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const pre = btn.previousElementSibling;
+        if (!pre) return;
+        try {
+          await navigator.clipboard.writeText(pre.textContent.trim());
+          const originalText = btn.textContent;
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('copied');
+          }, 1300);
+        } catch {
+          btn.textContent = 'Failed';
+        }
+      });
+    });
+
+    // Back to Top Scroll Behavior
+    const backToTopBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 240) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

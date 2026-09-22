@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>ILOM Command Quick Reference</title>
+      <style>
+            :root {
+                  --ink: #172027;
+                  --muted: #66737b;
+                  --line: #dce3e7;
+                  --paper: #f6f8f9;
+                  --card: #fff;
+                  --red: #b44735;
+                  --code: #152128;
+                  --hover-bg: #f0f4f7
+            }
+
+            * {
+                  box-sizing: border-box
+            }
+
+            html {
+                  scroll-behavior: smooth
+            }
+
+            body {
+                  margin: 0;
+                  background: var(--paper);
+                  color: var(--ink);
+                  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif
+            }
+
+            .bar {
+                  background: #fff;
+                  border-bottom: 1px solid var(--line);
+                  position: relative;
+                  z-index: 10
+            }
+
+            .bar>div,
+            main {
+                  width: min(1120px, calc(100% - 40px));
+                  margin: auto
+            }
+
+            .bar>div {
+                  height: 62px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between
+            }
+
+            .bar-left {
+                  display: flex;
+                  align-items: center;
+                  gap: 20px
+            }
+
+            .brand {
+                  font-weight: 800
+            }
+
+            /* --- Dropdown Menu Styles --- */
+            .dropdown {
+                  position: relative;
+                  display: inline-block
+            }
+
+            .dropdown-btn {
+                  background: #fff;
+                  border: 1px solid var(--line);
+                  padding: 6px 14px;
+                  border-radius: 6px;
+                  font: inherit;
+                  font-size: 13px;
+                  font-weight: 600;
+                  color: var(--ink);
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  transition: border-color .15s, color .15s
+            }
+
+            .dropdown-btn:hover,
+            .dropdown:hover .dropdown-btn,
+            .dropdown:focus-within .dropdown-btn {
+                  color: var(--red);
+                  border-color: var(--red)
+            }
+
+            .dropdown-btn svg {
+                  transition: transform .2s ease
+            }
+
+            .dropdown:hover .dropdown-btn svg,
+            .dropdown:focus-within .dropdown-btn svg {
+                  transform: rotate(180deg)
+            }
+
+            .dropdown-menu {
+                  display: none;
+                  position: absolute;
+                  top: calc(100% + 4px);
+                  left: 0;
+                  background: #fff;
+                  border: 1px solid var(--line);
+                  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .08);
+                  border-radius: 8px;
+                  min-width: 220px;
+                  padding: 6px 0;
+                  z-index: 50;
+                  list-style: none;
+                  margin: 0
+            }
+
+            .dropdown:hover .dropdown-menu,
+            .dropdown:focus-within .dropdown-menu {
+                  display: block
+            }
+
+            .dropdown-menu a {
+                  display: flex;
+                  flex-direction: column;
+                  padding: 8px 14px;
+                  color: var(--ink);
+                  text-decoration: none;
+                  font-size: 13px;
+                  font-weight: 600;
+                  transition: background .15s
+            }
+
+            .dropdown-menu a span {
+                  font-size: 11px;
+                  font-weight: 400;
+                  color: var(--muted)
+            }
+
+            .dropdown-menu a:hover {
+                  background: var(--hover-bg);
+                  color: var(--red)
+            }
+
+            .tag,
+            .note,
+            p {
+                  color: var(--muted)
+            }
+
+            main {
+                  padding: 40px 0 64px
+            }
+
+            .eyebrow {
+                  margin: 0;
+                  color: var(--red);
+                  font-size: 12px;
+                  font-weight: 800;
+                  letter-spacing: .12em
+            }
+
+            h1 {
+                  margin: 5px 0;
+                  font-size: clamp(34px, 5vw, 52px);
+                  line-height: 1.05;
+                  letter-spacing: -.05em
+            }
+
+            .intro {
+                  max-width: 720px;
+                  font-size: 17px
+            }
+
+            .tools {
+                  position: sticky;
+                  top: 0;
+                  z-index: 2;
+                  margin: 26px 0 18px;
+                  padding: 10px 0;
+                  background: #f6f8f9e8;
+                  backdrop-filter: blur(8px);
+                  display: flex;
+                  gap: 12px;
+                  align-items: center
+            }
+
+            .search {
+                  width: min(480px, 100%);
+                  padding: 10px 12px;
+                  border: 1px solid #bfcbd1;
+                  border-radius: 8px;
+                  font: inherit
+            }
+
+            .count {
+                  font-size: 13px;
+                  color: var(--muted)
+            }
+
+            .warning {
+                  margin: 0 0 28px;
+                  padding: 13px 16px;
+                  border-left: 4px solid #e77817;
+                  background: #fff7ed;
+                  color: #68411d
+            }
+
+            .jump {
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 7px;
+                  margin-bottom: 34px
+            }
+
+            .jump a {
+                  padding: 6px 10px;
+                  border: 1px solid var(--line);
+                  border-radius: 99px;
+                  background: #fff;
+                  color: var(--ink);
+                  text-decoration: none;
+                  font-size: 13px;
+                  font-weight: 700
+            }
+
+            section {
+                  margin: 38px 0;
+                  scroll-margin-top: 72px
+            }
+
+            h2 {
+                  margin: 0;
+                  font-size: 24px;
+                  letter-spacing: -.03em
+            }
+
+            .note {
+                  margin: 4px 0 15px
+            }
+
+            .grid {
+                  display: grid;
+                  grid-template-columns: repeat(2, minmax(0, 1fr));
+                  gap: 10px
+            }
+
+            .cmd {
+                  padding: 14px;
+                  border: 1px solid var(--line);
+                  border-radius: 10px;
+                  background: var(--card)
+            }
+
+            .danger {
+                  border-color: #efc79c;
+                  background: #fffdfa
+            }
+
+            .cmd h3 {
+                  margin: 0 0 8px;
+                  font-size: 14px
+            }
+
+            .danger h3 {
+                  color: #97521b
+            }
+
+            .row {
+                  display: flex;
+                  gap: 7px
+            }
+
+            code {
+                  display: block;
+                  min-width: 0;
+                  flex: 1;
+                  overflow: auto;
+                  padding: 9px 10px;
+                  border-radius: 6px;
+                  background: var(--code);
+                  color: #eef6f8;
+                  font: 13px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+                  white-space: nowrap
+            }
+
+            .cmd p {
+                  margin: 9px 0 0;
+                  font-size: 13px
+            }
+
+            .copy {
+                  min-width: 58px;
+                  padding: 0 10px;
+                  border: 1px solid #b8c5cb;
+                  border-radius: 6px;
+                  background: #fff;
+                  color: var(--ink);
+                  font-weight: 700;
+                  font-size: 12px;
+                  cursor: pointer
+            }
+
+            .copy:hover {
+                  color: var(--red);
+                  border-color: var(--red)
+            }
+
+            .copied {
+                  color: #19734a;
+                  border-color: #86c7a5
+            }
+
+            .empty {
+                  display: none;
+                  padding: 18px;
+                  border: 1px dashed #bfcbd1;
+                  border-radius: 8px;
+                  background: #fff;
+                  text-align: center
+            }
+
+            footer {
+                  margin-top: 48px;
+                  padding-top: 20px;
+                  border-top: 1px solid var(--line);
+                  color: var(--muted);
+                  font-size: 13px
+            }
+
+            /* --- Back to Top Floating Button --- */
+            .back-to-top {
+                  position: fixed;
+                  bottom: 24px;
+                  right: 24px;
+                  width: 44px;
+                  height: 44px;
+                  border-radius: 50%;
+                  background: #fff;
+                  border: 1px solid var(--line);
+                  box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: var(--ink);
+                  cursor: pointer;
+                  opacity: 0;
+                  visibility: hidden;
+                  transition: opacity .25s ease, visibility .25s ease, transform .2s ease, border-color .2s;
+                  z-index: 99
+            }
+
+            .back-to-top.visible {
+                  opacity: 1;
+                  visibility: visible
+            }
+
+            .back-to-top:hover {
+                  color: var(--red);
+                  border-color: var(--red);
+                  transform: translateY(-3px)
+            }
+
+            @media(max-width:700px) {
+                  .grid {
+                        grid-template-columns: 1fr
+                  }
+            }
+
+            @media(max-width:480px) {
+
+                  .bar>div,
+                  main {
+                        width: calc(100% - 28px)
+                  }
+
+                  .tag,
+                  .count {
+                        display: none
+                  }
+
+                  main {
+                        padding-top: 28px
+                  }
+            }
+      </style>
+</head>
+
+<body>
+      <header class="bar">
+            <div>
+                  <div class="bar-left">
+                        <span class="brand">ILOM Quick Reference</span>
+
+                        <!-- Dropdown Hover Menu -->
+                        <div class="dropdown">
+                              <button class="dropdown-btn" aria-haspopup="true" aria-expanded="false">
+                                    Related Docs
+                                    <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
+                                          <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5"
+                                                stroke-linecap="round" fill="none" />
+                                    </svg>
+                              </button>
+                              <ul class="dropdown-menu">
+                                    <!-- Add at the very top of the <ul class="dropdown-menu"> -->
+                                    <li class="dropdown-home">
+                                          <a href="index.html">
+                                                <span class="home-title">
+                                                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            style="margin-right: 4px; vertical-align: -1px;">
+                                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z">
+                                                            </path>
+                                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                                      </svg>
+                                                      Home Dashboard
+                                                </span>
+                                                <span>DC notes hub &amp; topic index</span>
+                                          </a>
+                                    </li>
+                                    <li style="height: 1px; background: var(--line); margin: 4px 0;"></li>
+                                    <li><a href="ilom_command.html">ILOM Commands<span>Hardware faults &amp;
+                                                      diagnostics</span></a></li>
+                                    <li><a href="hops_cli.html">HoPS CLI v8.0.857<span>Platform provisioning &amp;
+                                                      orchestration</span></a></li>
+                                    <li><a href="smartnic_triage.html">SmartNIC Triage<span>GPUv6 recovery &amp; SPI
+                                                      boot</span></a></li>
+                                    <li><a href="cable_validation.html">PCIe Cable Validation<span>Bus mapping &amp;
+                                                      hwdiag tests</span></a></li>
+                                    <li><a href="incident-log.html">Incident Log<span>Shift tracking &amp;
+                                                      handovers</span></a></li>
+                              </ul>
+                        </div>
+                  </div>
+
+                  <span class="tag">Oracle ILOM © 2026 Pravin Subramaniam. All rights reserved.</span>
+            </div>
+      </header>
+
+      <main id="top">
+            <p class="eyebrow">DATA CENTER QUICK NOTES</p>
+            <h1>ILOM commands, ready to copy.</h1>
+            <p class="intro">Find the task, then select <b>Copy</b>. Paths and commands can vary by platform and ILOM
+                  version—verify the target before making changes.</p>
+            <div class="tools">
+                  <input id="search" class="search" type="search" placeholder="Filter: NVMe, fault, power, network…"
+                        aria-label="Filter commands">
+                  <span id="count" class="count"></span>
+            </div>
+            <aside class="warning">
+                  <b>Before any disruptive action:</b> confirm the host serial and approval. Get
+                  approval for shutdowns, resets, firmware work, full snapshots, and clearing faults.
+            </aside>
+            <nav class="jump">
+                  <a href="#quick">Quick checks</a>
+                  <a href="#faults">Faults</a>
+                  <a href="#inventory">Inventory</a>
+                  <a href="#diag">Diagnostics</a>
+                  <a href="#power">Power &amp; control</a>
+                  <a href="#snapshot">Snapshot</a>
+                  <a href="#access">Network &amp; console</a>
+            </nav>
+
+            <section id="quick">
+                  <h2>Quick checks</h2>
+                  <p class="note">Start here to establish health, faults, firmware, and power state.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>System health</h3>
+                              <div class="row"><code>show /System -t health</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Overall system health state.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Open problems</h3>
+                              <div class="row"><code>show /System/Open_Problems</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Current host problems reported by ILOM.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Fault summary</h3>
+                              <div class="row"><code>show faulty</code><button class="copy">Copy</button></div>
+                              <p>ILOM fault information.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Event log</h3>
+                              <div class="row"><code>show /SP/logs/event/list</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Service-processor event log.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Firmware versions</h3>
+                              <div class="row"><code>show -l all -d properties /System/Firmware</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Firmware details in one view.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Host power state</h3>
+                              <div class="row"><code>show /SYS power_state</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Whether the host is on or off.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>ILOM / SP version</h3>
+                              <div class="row"><code>version /SP</code><button class="copy">Copy</button></div>
+                              <p>Installed ILOM firmware version.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Service processor clock</h3>
+                              <div class="row"><code>show /SP/clock</code><button class="copy">Copy</button></div>
+                              <p>Checks ILOM time and synchronization state.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="faults">
+                  <h2>Fault investigation &amp; clearing</h2>
+                  <p class="note">Enter the fault-management shell before running fmadm or fmdump.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>Open fault-management shell</h3>
+                              <div class="row"><code>start -script /SP/faultmgmt/shell</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Confirm when prompted.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>All FMA faults</h3>
+                              <div class="row"><code>fmadm faulty -a</code><button class="copy">Copy</button></div>
+                              <p>Includes faults outside the default view.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Detailed fault events</h3>
+                              <div class="row"><code>fmdump -eVi</code><button class="copy">Copy</button></div>
+                              <p>Raw ereports for investigation.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Clear a specific fault</h3>
+                              <div class="row"><code>fmadm repair &lt;device-path&gt;</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Preferred method; example path: /SYS/MB.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Mark replaced hardware</h3>
+                              <div class="row"><code>fmadm replace &lt;device-path&gt;</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Use after replacement if state does not refresh.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Clear all FMA faults</h3>
+                              <div class="row"><code>fmadm repair allfaults</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Only after confirming every issue is resolved.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="inventory">
+                  <h2>Hardware inventory</h2>
+                  <p class="note">Component details commonly used during triage.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>Processors</h3>
+                              <div class="row"><code>show -l all -d properties /System/Processors</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Processor properties and status.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Memory DIMMs</h3>
+                              <div class="row"><code>show -l all -d properties /System/Memory/DIMMs</code><button
+                                          class="copy">Copy</button></div>
+                              <p>DIMM properties and details.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Storage disks</h3>
+                              <div class="row"><code>show -l all -d properties /System/Storage/Disks</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Use Controllers, Expanders, or Volumes for those views.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>PCI add-on devices</h3>
+                              <div class="row"><code>show -l all -d properties /System/PCI_Devices/Add-on</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Use On-board for onboard devices.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Power supplies</h3>
+                              <div class="row">
+                                    <code>show -l all -d properties /System/Power/Power_Supplies</code><button
+                                          class="copy">Copy</button>
+                              </div>
+                              <p>Power-supply status and properties.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Fans</h3>
+                              <div class="row"><code>show -l all -d properties /System/Cooling/Fans</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Fan information and status.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>BIOS</h3>
+                              <div class="row"><code>show -d properties /SYS/MB/BIOS</code><button
+                                          class="copy">Copy</button></div>
+                              <p>BIOS information.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Motherboard</h3>
+                              <div class="row"><code>show -l all /SYS/MB</code><button class="copy">Copy</button></div>
+                              <p>Motherboard information.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="diag">
+                  <h2>Diagnostic shell</h2>
+                  <p class="note">Use when normal ILOM fault reporting does not identify the issue.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>Enter diagnostic shell</h3>
+                              <div class="row"><code>start -script /SP/diag/shell</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Confirm when prompted; use exit to return.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>System inventory</h3>
+                              <div class="row"><code>hwdiag system inventory</code><button class="copy">Copy</button>
+                              </div>
+                              <p>System component inventory.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>System thermal state</h3>
+                              <div class="row"><code>hwdiag system thermal</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Temperatures, fan speeds, and power together.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>NVMe information</h3>
+                              <div class="row"><code>hwdiag io nvme_info</code><button class="copy">Copy</button></div>
+                              <p>NVMe details and faults.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>NVMe test</h3>
+                              <div class="row"><code>hwdiag io nvme_test</code><button class="copy">Copy</button></div>
+                              <p>Tests NVMe drives, controller cards, and cables.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>PCI status</h3>
+                              <div class="row"><code>hwdiag pci status all</code><button class="copy">Copy</button>
+                              </div>
+                              <p>PCI target status for all devices.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>I²C connectivity test</h3>
+                              <div class="row"><code>hwdiag i2c test all</code><button class="copy">Copy</button></div>
+                              <p>Tests all I²C devices.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Host boot progress</h3>
+                              <div class="row"><code>hwdiag system port80</code><button class="copy">Copy</button></div>
+                              <p>Host boot progress code.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="power">
+                  <h2>Power &amp; service control</h2>
+                  <p class="note">These commands affect availability. Confirm the correct host and approval first.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>Power on host</h3>
+                              <div class="row"><code>start /SYS</code><button class="copy">Copy</button></div>
+                              <p>Starts the host and operating system.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Graceful host shutdown</h3>
+                              <div class="row"><code>stop /SYS</code><button class="copy">Copy</button></div>
+                              <p>Shuts down the OS and powers off the host.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Force host shutdown</h3>
+                              <div class="row"><code>stop /SYS -f</code><button class="copy">Copy</button></div>
+                              <p>Use only when normal shutdown is unresponsive.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Restart host</h3>
+                              <div class="row"><code>reset /SYS</code><button class="copy">Copy</button></div>
+                              <p>Immediately restarts the host.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Cold / deep power cycle</h3>
+                              <div class="row"><code>stop /SYS -f</code><button class="copy">Copy</button></div>
+                              <p>Wait for <code>show /SYS power_state</code> = Off, then run <code>start /SYS</code>.
+                              </p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Restart service processor</h3>
+                              <div class="row"><code>reset /SP</code><button class="copy">Copy</button></div>
+                              <p>Restarts ILOM/SP and disconnects the session.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Locator LED on</h3>
+                              <div class="row"><code>set /SYS/LOCATE value=Fast_blink</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Turns on front and rear locator LEDs.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Locator LED off</h3>
+                              <div class="row"><code>set /SYS/LOCATE value=off</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Turns off locator LEDs.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="snapshot">
+                  <h2>Full diagnostic snapshot</h2>
+                  <p class="note">A full snapshot can reboot the host. Obtain approval when allocated.</p>
+                  <div class="grid">
+                        <article class="cmd danger">
+                              <h3>Set full dataset</h3>
+                              <div class="row">
+                                    <code>ssh -l &lt;guid&gt; &lt;ilom-ip&gt; set /SP/diag/snapshot dataset=full</code><button
+                                          class="copy">Copy</button>
+                              </div>
+                              <p>Includes all available outputs and logs.</p>
+                        </article>
+                        <article class="cmd danger">
+                              <h3>Generate snapshot archive</h3>
+                              <div class="row">
+                                    <code>ssh -l &lt;guid&gt; &lt;ilom-ip&gt; set -script /SP/diag/snapshot dump_uri=console &gt; &lt;serial&gt;.zip</code><button
+                                          class="copy">Copy</button>
+                              </div>
+                              <p>Wait up to 10 minutes for the archive.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Verify snapshot</h3>
+                              <div class="row">
+                                    <code>ssh -l &lt;guid&gt; &lt;ilom-ip&gt; show /SP/diag/snapshot</code><button
+                                          class="copy">Copy</button>
+                              </div>
+                              <p>Checks snapshot status.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Return to normal dataset</h3>
+                              <div class="row">
+                                    <code>ssh -l &lt;guid&gt; &lt;ilom-ip&gt; set /SP/diag/snapshot dataset=normal</code><button
+                                          class="copy">Copy</button>
+                              </div>
+                              <p>Run after collection is complete.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="access">
+                  <h2>Network, console &amp; sessions</h2>
+                  <p class="note">Connection and configuration checks that do not change the host.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>Network details</h3>
+                              <div class="row"><code>show -l all -d properties /SP/network</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Service-processor network properties.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>DNS client settings</h3>
+                              <div class="row"><code>show -d properties /SP/clients/dns</code><button
+                                          class="copy">Copy</button></div>
+                              <p>Client DNS settings.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Users</h3>
+                              <div class="row"><code>show /SP/users</code><button class="copy">Copy</button></div>
+                              <p>Service-processor users.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Active sessions</h3>
+                              <div class="row"><code>show /SP/sessions</code><button class="copy">Copy</button></div>
+                              <p>Active ILOM sessions.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Open host console</h3>
+                              <div class="row"><code>start /HOST/console</code><button class="copy">Copy</button></div>
+                              <p>Exit to ILOM with Esc+Shift+9.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Console history</h3>
+                              <div class="row"><code>show /HOST/console/history</code><button class="copy">Copy</button>
+                              </div>
+                              <p>Stored host console output.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <p class="empty" id="empty">No commands match this filter.</p>
+            <footer>Source reference: Oracle Confluence ILOM Commands. Always confirm paths on the target platform
+                  before acting.</footer>
+      </main>
+
+      <!-- Back to Top Floating Button -->
+      <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Scroll to top">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="19" x2="12" y2="5"></line>
+                  <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+      </button>
+
+      <script>
+            const cards = [...document.querySelectorAll('.cmd')];
+            const sections = [...document.querySelectorAll('main section')];
+            const search = document.querySelector('#search');
+            const count = document.querySelector('#count');
+            const empty = document.querySelector('#empty');
+
+            function filter() {
+                  const t = search.value.trim().toLowerCase();
+                  let n = 0;
+                  cards.forEach(c => {
+                        const yes = !t || c.textContent.toLowerCase().includes(t);
+                        c.hidden = !yes;
+                        if (yes) n++;
+                  });
+                  sections.forEach(s => s.hidden = t && ![...s.querySelectorAll('.cmd')].some(c => !c.hidden));
+                  count.textContent = t ? `${n} command${n === 1 ? '' : 's'} found` : `${cards.length} commands`;
+                  empty.style.display = t && !n ? 'block' : 'none';
+            }
+
+            search.addEventListener('input', filter);
+            filter();
+
+            // Clipboard Copy handler
+            document.querySelectorAll('.copy').forEach(b => b.addEventListener('click', async () => {
+                  try {
+                        await navigator.clipboard.writeText(b.previousElementSibling.textContent);
+                        b.textContent = 'Copied';
+                        b.classList.add('copied');
+                  } catch {
+                        b.textContent = 'Select';
+                  }
+                  setTimeout(() => {
+                        b.textContent = 'Copy';
+                        b.classList.remove('copied');
+                  }, 1300);
+            }));
+
+            // Back to top scroll handler
+            const backToTopBtn = document.getElementById('backToTop');
+            window.addEventListener('scroll', () => {
+                  if (window.scrollY > 240) {
+                        backToTopBtn.classList.add('visible');
+                  } else {
+                        backToTopBtn.classList.remove('visible');
+                  }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                  window.scrollTo({top: 0, behavior: 'smooth'});
+            });
+      </script>
+</body>
+
+</html>
