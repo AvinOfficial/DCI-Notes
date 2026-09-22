@@ -403,7 +403,6 @@
                                     </svg>
                               </button>
                               <ul class="dropdown-menu">
-                                    <!-- Add at the very top of the <ul class="dropdown-menu"> -->
                                     <li class="dropdown-home">
                                           <a href="index.html">
                                                 <span class="home-title">
@@ -445,7 +444,7 @@
             <p class="intro">Find the task, then select <b>Copy</b>. Paths and commands can vary by platform and ILOM
                   version—verify the target before making changes.</p>
             <div class="tools">
-                  <input id="search" class="search" type="search" placeholder="Filter: NVMe, fault, power, network…"
+                  <input id="search" class="search" type="search" placeholder="Filter: NVMe, i2c, fabric, fault, power, network…"
                         aria-label="Filter commands">
                   <span id="count" class="count"></span>
             </div>
@@ -457,7 +456,8 @@
                   <a href="#quick">Quick checks</a>
                   <a href="#faults">Faults</a>
                   <a href="#inventory">Inventory</a>
-                  <a href="#diag">Diagnostics</a>
+                  <a href="#diag">Diagnostics &amp; Diag Shell</a>
+                  <a href="#hw-fabric">Fabric &amp; I²C Subsystem</a>
                   <a href="#power">Power &amp; control</a>
                   <a href="#snapshot">Snapshot</a>
                   <a href="#access">Network &amp; console</a>
@@ -613,52 +613,99 @@
             </section>
 
             <section id="diag">
-                  <h2>Diagnostic shell</h2>
-                  <p class="note">Use when normal ILOM fault reporting does not identify the issue.</p>
+                  <h2>Diagnostics &amp; Diag Shell</h2>
+                  <p class="note">Enter the diagnostic shell (<code>start /SP/diag/shell</code>) when standard ILOM reporting does not isolate the issue.</p>
                   <div class="grid">
                         <article class="cmd">
                               <h3>Enter diagnostic shell</h3>
                               <div class="row"><code>start -script /SP/diag/shell</code><button
                                           class="copy">Copy</button></div>
-                              <p>Confirm when prompted; use exit to return.</p>
+                              <p>X7/X8/X9/X10 targets; on older X4-X6 run <code>set SESSION mode=restricted</code>.</p>
                         </article>
                         <article class="cmd">
                               <h3>System inventory</h3>
                               <div class="row"><code>hwdiag system inventory</code><button class="copy">Copy</button>
                               </div>
-                              <p>System component inventory.</p>
+                              <p>Low-level chassis component inventory.</p>
                         </article>
                         <article class="cmd">
                               <h3>System thermal state</h3>
                               <div class="row"><code>hwdiag system thermal</code><button class="copy">Copy</button>
                               </div>
-                              <p>Temperatures, fan speeds, and power together.</p>
+                              <p>Temperatures, fan RPMs, and power levels together.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Host boot progress (Port 80)</h3>
+                              <div class="row"><code>hwdiag system port80</code><button class="copy">Copy</button></div>
+                              <p>Displays current or historical host POST boot codes.</p>
                         </article>
                         <article class="cmd">
                               <h3>NVMe information</h3>
                               <div class="row"><code>hwdiag io nvme_info</code><button class="copy">Copy</button></div>
-                              <p>NVMe details and faults.</p>
+                              <p>NVMe controller details, lane speed, and drive faults.</p>
                         </article>
                         <article class="cmd">
                               <h3>NVMe test</h3>
                               <div class="row"><code>hwdiag io nvme_test</code><button class="copy">Copy</button></div>
-                              <p>Tests NVMe drives, controller cards, and cables.</p>
+                              <p>Tests NVMe drives, controller cards, and PCIe cabling.</p>
                         </article>
                         <article class="cmd">
-                              <h3>PCI status</h3>
+                              <h3>PCI device status</h3>
                               <div class="row"><code>hwdiag pci status all</code><button class="copy">Copy</button>
                               </div>
-                              <p>PCI target status for all devices.</p>
+                              <p>PCI target link status and negotiation for all devices.</p>
                         </article>
                         <article class="cmd">
-                              <h3>I²C connectivity test</h3>
+                              <h3>Fan control &amp; test</h3>
+                              <div class="row"><code>hwdiag fan test all</code><button class="copy">Copy</button></div>
+                              <p>Tests fan tachometers, PWM regulation, and kill circuits.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>CPLD / FPGA status</h3>
+                              <div class="row"><code>hwdiag cpld spi_global_reg</code><button class="copy">Copy</button></div>
+                              <p>Reads global SPI/CPLD registers and board control flags.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>System LED test</h3>
+                              <div class="row"><code>hwdiag led test all</code><button class="copy">Copy</button></div>
+                              <p>Toggles and verifies status/fault LEDs across the chassis.</p>
+                        </article>
+                  </div>
+            </section>
+
+            <section id="hw-fabric">
+                  <h2>Fabric &amp; I²C Subsystem</h2>
+                  <p class="note">Run from the diagnostic shell (<code>diag&gt;</code>) to validate bus links, sideband busses, and multiplexers.</p>
+                  <div class="grid">
+                        <article class="cmd">
+                              <h3>Fabric test (All links)</h3>
+                              <div class="row"><code>hwdiag system fabric test all</code><button class="copy">Copy</button></div>
+                              <p>Validates UPI/QPI interconnects, PCIe bus speeds, and memory bus freq.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Fabric test (Specific CPU)</h3>
+                              <div class="row"><code>hwdiag system fabric test cpu0</code><button class="copy">Copy</button></div>
+                              <p>Targets UPI/QPI point-to-point links for a single processor socket.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>I²C connectivity test (All)</h3>
                               <div class="row"><code>hwdiag i2c test all</code><button class="copy">Copy</button></div>
-                              <p>Tests all I²C devices.</p>
+                              <p>Executes Pass/Fail communication test across all sideband I²C buses.</p>
                         </article>
                         <article class="cmd">
-                              <h3>Host boot progress</h3>
-                              <div class="row"><code>hwdiag system port80</code><button class="copy">Copy</button></div>
-                              <p>Host boot progress code.</p>
+                              <h3>I²C connectivity test (Specific bus)</h3>
+                              <div class="row"><code>hwdiag i2c test &lt;bus#&gt;</code><button class="copy">Copy</button></div>
+                              <p>Tests a specific bus channel (e.g. <code>hwdiag i2c test 0</code> or <code>1</code>).</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Scan I²C devices (All buses)</h3>
+                              <div class="row"><code>hwdiag i2c scan all</code><button class="copy">Copy</button></div>
+                              <p>Scans and outputs all responsive I²C addresses behind muxes.</p>
+                        </article>
+                        <article class="cmd">
+                              <h3>Scan I²C devices (Specific bus)</h3>
+                              <div class="row"><code>hwdiag i2c scan &lt;bus#&gt;</code><button class="copy">Copy</button></div>
+                              <p>Discovers devices responding on a specific I²C target segment.</p>
                         </article>
                   </div>
             </section>
@@ -793,8 +840,7 @@
             </section>
 
             <p class="empty" id="empty">No commands match this filter.</p>
-            <footer>Source reference: Oracle Confluence ILOM Commands. Always confirm paths on the target platform
-                  before acting.</footer>
+            <footer>Source reference: Oracle ILOM &amp; HWdiag Command Suite. Always confirm paths on the target platform before acting.</footer>
       </main>
 
       <!-- Back to Top Floating Button -->

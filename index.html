@@ -571,21 +571,30 @@
                 </span>
                 <span>DC notes hub &amp; topic index</span>
               </a>
+            <li>
+              <a href="index.html">Operations Hub<span>Central overview &amp; active runbooks</span></a>
             </li>
             <li style="height: 1px; background: var(--line); margin: 4px 0;"></li>
-            <li><a href="ilom_command.html">ILOM Commands<span>Hardware faults &amp;
-                  diagnostics</span></a></li>
-            <li><a href="hops_cli.html">HoPS CLI v8.0.857<span>Platform provisioning &amp;
-                  orchestration</span></a></li>
-            <li><a href="smartnic_triage.html">SmartNIC Triage<span>GPUv6 recovery &amp; SPI
-                  boot</span></a></li>
-            <li><a href="cable_validation.html">PCIe Cable Validation<span>Bus mapping &amp;
-                  hwdiag tests</span></a></li>
             <li>
-              <a href="switch_triage.html">
-                Switch Triage
-                <span>Mellanox mlxlink, IB &amp; Arista EOS</span>
-              </a>
+              <a href="ilom_command.html">ILOM Commands<span>Hardware faults &amp; diagnostics</span></a>
+            </li>
+            <li>
+              <a href="hops_cli.html">HoPS CLI v8.0.857<span>Platform provisioning &amp; orchestration</span></a>
+            </li>
+            <li>
+              <a href="smartnic_triage.html">SmartNIC Triage<span>GPUv6 recovery &amp; SPI boot</span></a>
+            </li>
+            <li>
+              <a href="cable_validation.html">PCIe Cable Validation<span>Bus mapping &amp; hwdiag tests</span></a>
+            </li>
+            <li>
+              <a href="switch_triage.html">Switch Triage<span>Mellanox mlxlink, IB &amp; Arista EOS</span></a>
+            </li>
+            <li>
+              <a href="arista_phy_triage.html">Arista PHY Triage<span>Optics DDM, CRC, Flaps &amp; FEC</span></a>
+            </li>
+            <li>
+              <a href="incident-log.html">Incident Log<span>Shift tracking &amp; handovers</span></a>
             </li>
           </ul>
         </div>
@@ -682,7 +691,24 @@
           </div>
         </a>
 
-        <!-- 05: Switch Triage -->
+        <!-- 05: Arista PHY Triage -->
+        <a class="note-card" href="arista_phy_triage.html">
+          <div class="card-top">
+            <span class="card-number">NET-06</span>
+            <span class="card-icon" aria-hidden="true">🔬</span>
+          </div>
+          <span class="card-meta">Layer 1 Diagnostics</span>
+          <strong>Arista PHY &amp; Optics</strong>
+          <span class="card-body">
+            DOM/DDM optical power triage, non-zero CRC filters, link flap frequency, FEC word analysis, and controlled port bounce.
+          </span>
+          <div class="card-footer">
+            <span>Launch Guide</span>
+            <b aria-hidden="true">→</b>
+          </div>
+        </a>
+
+        <!-- 07: Switch Triage -->
         <a class="note-card" href="switch_triage.html">
           <div class="card-top">
             <span class="card-number">NET-05</span>
@@ -779,7 +805,7 @@
     });
 
     backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 </body>
